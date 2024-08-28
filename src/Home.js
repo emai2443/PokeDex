@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Thumbnail from './components/Thumbnail';
 
 const Home = () => {
   const [displayPokemon, setdisplayPokemon] = useState([]);
@@ -12,27 +13,48 @@ const Home = () => {
 
     setLoadMore(json.next);
 
-    async function setPokemonObject(result) {
-      for (const pokemon of result) {
+    function setPokemonObject(result) {
+      result.forEach(async (pokemon) => {
         const res = await fetch(
           `https://pokeapi.co/api/v2/pokemon/${pokemon.name}`
         );
         const json = await res.json();
 
         setdisplayPokemon((currentList) => [...currentList, json]);
-      }
+      });
     }
     setPokemonObject(json.results);
-    await console.log(displayPokemon);
   };
 
   useEffect(() => {
     getAllPokemon();
   }, []);
 
+  console.log(displayPokemon);
+
   return (
-    <div>
-      <li></li>
+    <div className="app-container">
+      <h1 className="title">PokeDex</h1>
+      <div className="pokemon-continer">
+        <div className="all-container">
+          {displayPokemon.map((pokemon, index) => (
+            <ul>
+              <li>
+                <Thumbnail
+                  id={pokemon.id}
+                  name={pokemon.name}
+                  image={pokemon.sprites.other.dream_world.front_default}
+                  type={pokemon.types[0].type.name}
+                  key={index}
+                />
+              </li>
+            </ul>
+          ))}
+        </div>
+        <button className="loadMore" onClick={() => getAllPokemon()}>
+          Load More
+        </button>
+      </div>
     </div>
   );
 };
